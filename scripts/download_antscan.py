@@ -11,11 +11,30 @@ from loguru import logger
 
 from neuromechants import get_bulkdata_dir
 
+# URLs and regex patterns for parsing the BIOMEDISA AntScan pages
 BIOMEDISA_INDEX_PAGE_URL = "https://biomedisa.info/antscan/?show_all=True"
 BIOMEDISA_details_page_URL_TEMPLATE = "https://biomedisa.info/antscan/specimen/{id_}/"
 BIOMEDISA_DOWNLOAD_URL_TEMPLATE = (
     "https://biomedisa.info/antscan/download/?id={id_}&object=processed"
 )
+
+# For parsing patterns like this:
+# <td>
+# <div id="img560" >
+#     <p style="text-align:left;">
+#     <!-- screenshot -->
+#     <a href="/antscan/specimen/560"><img src="/media/antscan/processed/5x/24-43.png" title="info" style="width:425px;height:238px;border:0"></a>
+#     </br></br>
+#     <!-- get name of specimen -->
+#         <span>Acanthognathus cf.ocellatus | Myrmicinae | male | CASENT0744649</span>
+#     <!-- feature buttons --></br>
+#     <a href=# onclick="downloadFunction(560,'specimen','antscan')"><img src="/static/downloads.png" alt="download" style="width:20px;height:20px;border:0;"></a>
+#     <a href=# onclick="sliceviewerFunction(560,'antscan')"><img src="/static/2D_plain.png" title="slice viewer" width="30" height="20" onMouseOver="this.src='/static/2D_filled.png'" onMouseOut="this.src='/static/2D_plain.png'"></a>
+#     <a href=# onclick="visualizationFunction(560,'antscan')"><img src="/static/mesh.svg" title="visualization" style="width:20px;height:20px;"></a>
+#     <a href="/antscan/specimen/560"><img src="/static/info.png" alt="info" style="width:20px;height:20px;border:0;"></a>
+#     </p>
+# </div>
+# </td>
 RE_PATTERN_INDEX_PAGE = re.compile(
     r"<td>"
     r"[\s\S]+?"
@@ -28,6 +47,29 @@ RE_PATTERN_INDEX_PAGE = re.compile(
     r"[\s\S]+?"
     r"</td>"
 )
+
+# For parsing patterns like this:
+# <h2> <span> Processed data </span> </h2>
+#     <div id="img2191" >
+#         <p style="text-align:left;">
+#         <a href=# onclick="visualizationFunction(2191,'processed','antscan')"><img src="/static/file_mesh.svg" title="visualization" style="width:50px;height:50px;border:0;"></a>
+#         <a href=# onclick="downloadFunction(2191,'processed','antscan')"><img src="/static/downloads.png" title="download" style="width:20px;height:20px;border:0;"></a>
+#         <a href=# onclick="visualizationFunction(2191,'processed','antscan')"><img src="/static/mesh.svg" title="visualization" style="width:20px;height:20px;"></a>
+#         <a href=# onclick="alertFunction('Login in to copy to storage')"><img src="/static/share2.png" title="share" style="width:20px;height:20px;border:0;"></a>
+#         antscan/processed/5x/24-43.stl
+#         <span style="float:right;"> </br> Jan. 30, 2023, 2:58 p.m.</span>
+#         </p>
+#     </div>
+#     <div id="img12205" >
+#         <p style="text-align:left;">
+#         <img src="/static/file_image.svg" title="visualization" style="width:50px;height:50px;border:0;">
+#         <a href=# onclick="downloadFunction(12205,'processed','antscan')"><img src="/static/downloads.png" alt="download" style="width:20px;height:20px;border:0;"></a>
+#         <a href=# onclick="sliceviewerFunction(12205,'processed','antscan')"><img src="/static/2D_plain.png" title="slice viewer" width="30" height="20" onMouseOver="this.src='/static/2D_filled.png'" onMouseOut="this.src='/static/2D_plain.png'"></a>
+#         <a href=# onclick="alertFunction('Login in to copy to storage')"><img src="/static/share2.png" title="share" style="width:20px;height:20px;border:0;"></a>
+#         antscan/processed/5x/24-43.tif
+#         <span style="float:right;"> </br> Feb. 6, 2023, 1:27 p.m.</span>
+#         </p>
+#     </div>
 RE_PATTERN_details_page_MESHFILE = re.compile(
     r"<div id=\"img(?P<imgid_from_div>\d+)\" >"
     r"(?:(?!</div>)[\s\S])*"
