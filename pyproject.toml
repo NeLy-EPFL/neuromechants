@@ -1,0 +1,25 @@
+[project]
+name = "neuromechants"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "polars>=1,<2",
+    "numpy>=2,<3",
+    "tqdm>=4,<5",
+    "loguru==0.7.3",
+    "wget>=3,<4",
+    "fastexcel==0.19.0",
+    "PyYAML>=6,<7",
+    "jupyter>=1,<2",
+    "black>=26.1,<27",
+    "nbstripout==0.9.1",  # git pre-commit filter: strips output from ipynb notebooks
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
